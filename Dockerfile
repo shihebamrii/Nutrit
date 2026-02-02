@@ -11,11 +11,6 @@ RUN wget -q https://archive.apache.org/dist/tomcat/tomcat-10/v${TOMCAT_VERSION}/
     && mv /opt/apache-tomcat-${TOMCAT_VERSION} /opt/tomcat \
     && rm apache-tomcat-${TOMCAT_VERSION}.tar.gz
 
-# Download NetBeans CopyLibs task JAR (required for Ant build)
-RUN mkdir -p /opt/netbeans-ant && \
-    wget -q -O /opt/netbeans-ant/org-netbeans-modules-java-j2seproject-copylibstask.jar \
-    https://repo1.maven.org/maven2/org/netbeans/modules/org-netbeans-modules-java-j2seproject-copylibstask/RELEASE230/org-netbeans-modules-java-j2seproject-copylibstask-RELEASE230.jar
-
 WORKDIR /app
 
 # Copy project files
@@ -23,7 +18,7 @@ COPY . .
 
 # Build the WAR file using Ant, providing Tomcat path and CopyLibs
 RUN ant -Dj2ee.server.home=/opt/tomcat \
-    -Dlibs.CopyLibs.classpath=/opt/netbeans-ant/org-netbeans-modules-java-j2seproject-copylibstask.jar \
+    -Dlibs.CopyLibs.classpath=/app/lib/org-netbeans-modules-java-j2seproject-copylibstask.jar \
     clean dist
 
 # Runtime stage
@@ -37,4 +32,3 @@ COPY --from=build /app/dist/Nutrit.war /usr/local/tomcat/webapps/ROOT.war
 
 EXPOSE 8080
 CMD ["catalina.sh", "run"]
-
