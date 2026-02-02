@@ -1,0 +1,201 @@
+================================================================================
+                    NUTRIT - FONCTIONNALITÉS ET RÔLES
+                        Documentation Complète
+================================================================================
+Généré à partir de l'analyse du code source (Java/Jakarta EE, JSP, MySQL).
+
+--------------------------------------------------------------------------------
+1. VUE D'ENSEMBLE DES RÔLES
+--------------------------------------------------------------------------------
+
+L'application gère QUATRE rôles utilisateurs distincts :
+
+  • PATIENT       : Utilisateur final cherchant un suivi nutritionnel, des plans
+                    alimentaires et un contact avec des experts.
+  • NUTRITIONNISTE: Professionnel de santé gérant ses patients, créant des plans
+                    de repas, définissant ses disponibilités et publiant du contenu.
+  • SECRÉTAIRE    : Assistant(e) rattaché(e) à un nutritionniste spécifique. Gère
+                    l'agenda, les prises de rendez-vous et la facturation.
+  • ADMINISTRATEUR: Gestionnaire de la plateforme (validation des comptes pro,
+                    modération du contenu communautaire).
+
+--------------------------------------------------------------------------------
+2. FONCTIONNALITÉS PUBLIQUES (Accessibles sans connexion)
+--------------------------------------------------------------------------------
+
+  • Page d'Accueil & Landing Page
+    - Présentation marketing, témoignages, section "Avant/Après", vidéo démo.
+    - Bouton d'installation PWA (Progressive Web App) pour mobile/desktop.
+
+  • Recherche d'Experts
+    - Liste des nutritionnistes actifs.
+    - Filtres : Par gouvernorat (localisation), spécialisation, type de consultation
+      (en ligne/présentiel/hybride), genre.
+    - Affichage carte (si coordonnées GPS disponibles).
+
+  • Profil Public Nutritionniste
+    - Biographie, spécialités, tarifs, adresse du cabinet.
+    - Avis et notes laissés par les patients.
+    - Bouton pour se connecter/s'inscrire afin de prendre rendez-vous.
+
+  • Authentification
+    - Connexion (Email/Mot de passe) avec redirection automatique selon le rôle.
+    - Inscription :
+      * Patient : Inscription simple (Nom, Email, Tel, Adresse).
+      * Nutritionniste : Inscription détaillée (Infos pro, Diplômes, Tarif, 
+        Horaires, Cabinet, Spécialités). *Note: Compte soumis à validation admin.*
+    - Mot de passe oublié (Envoi d'un lien sécurisé par email).
+
+--------------------------------------------------------------------------------
+3. FONCTIONNALITÉS PATIENT
+--------------------------------------------------------------------------------
+
+  • Tableau de Bord (Dashboard)
+    - Vue d'ensemble : Prochain rendez-vous, nutritionniste lié, résumé du plan
+      alimentaire actuel.
+    - Accès rapide aux fonctions principales.
+
+  • Gestion du Dossier Médical (Health Profile)
+    - Remplissage/Modification des données de santé : Poids, Taille, Objectifs 
+      (perte de poids, prise de masse, etc.), Antécédents médicaux, Allergies, 
+      Préférences alimentaires.
+
+  • Relation avec le Nutritionniste
+    - Recherche et "Demande de suivi" auprès d'un nutritionniste.
+    - Prise de rendez-vous : Choix date/heure selon disponibilités du pro.
+    - Liste des demandes de rendez-vous (en attente, approuvées, rejetées).
+
+  • Suivi Nutritionnel
+    - Plans Alimentaires : Consultation des plans assignés par le nutritionniste.
+    - Planning de Repas (Meal Plan) : Vue détaillée jour par jour (Petit-déj, 
+      Déjeuner, Dîner, Collation) avec aliments et portions.
+    - Journal Alimentaire (Meal Tracking) : Cocher les repas consommés, noter les
+      écarts ou repas alternatifs.
+    - Suivi Quotidien (Daily Progress) : Enregistrement du poids du jour, humeur,
+      consommation d'eau.
+
+  • Facturation
+    - Consultation de l'historique des factures de consultations.
+    - Statut des paiements (Payé / En attente).
+
+  • Communauté & Social
+    - Fil d'actualité : Voir les posts des nutritionnistes ou amis suivis.
+    - Interaction : Liker, Commenter, Sauvegarder (Signet), Signaler un post.
+    - Gestion Amis/Suivis/Followers.
+
+  • Chat
+    - Messagerie instantanée avec son nutritionniste attitré.
+    - Discussion avec d'autres utilisateurs (amis).
+
+--------------------------------------------------------------------------------
+4. FONCTIONNALITÉS NUTRITIONNISTE
+--------------------------------------------------------------------------------
+
+  • Tableau de Bord
+    - Statistiques : Nombre de patients actifs, RDV du jour.
+    - Vue rapide sur les activités récentes.
+
+  • Gestion des Patients
+    - Liste des patients suivis.
+    - Accès complet au dossier patient : Profil santé, Historique de suivi, 
+      Graphiques de progression (poids, compliance), Journaux alimentaires.
+
+  • Gestion des Rendez-vous & Agenda
+    - Définition des "Disponibilités" hebdomadaires (Créneaux horaires).
+    - Vue calendrier des rendez-vous.
+    - Historique des consultations.
+
+  • Plans Alimentaires & Repas
+    - Création de "Modèles de Régime" (Templates) réutilisables.
+    - Création de Plans de Repas personnalisés pour un patient spécifique (ajout 
+      d'aliments depuis la base de données, définition des portions).
+    - Assignation de plans à des patients.
+
+  • Gestion du Cabinet (Secrétariat)
+    - Création de comptes "Secrétaire".
+    - Liste des secrétaires rattachés au cabinet (gestion, suppression).
+
+  • Communauté (Influenceur Pro)
+    - Publication de contenu (Conseils, Recettes, Actualités) visible par les 
+      patients/abonnés.
+    - Gestion de son image et interactions.
+
+  • Profil Professionnel
+    - Mise à jour des infos publiques : Bio, Photos, Tarifs, Localisation map.
+
+--------------------------------------------------------------------------------
+5. FONCTIONNALITÉS SECRÉTAIRE
+--------------------------------------------------------------------------------
+
+  *Le rôle Secrétaire est strictement lié à un Nutritionniste.*
+
+  • Tableau de Bord Secrétariat
+    - Liste des rendez-vous du jour pour le nutritionniste.
+    - Compteurs de demandes en attente (Nouveaux patients, Nouveaux RDV).
+
+  • Gestion des Demandes
+    - Demandes de Patients : Accepter ou Refuser les nouveaux patients souhaitant
+      être suivis par le nutritionniste.
+    - Demandes de Rendez-vous : Approuver ou Rejeter les demandes de RDV faites
+      par les patients en ligne. Ajout de notes internes.
+
+  • Gestion de l'Agenda
+    - Prise de Rendez-vous Directe : Pour un patient qui appelle ou vient au cabinet
+      (outrepasse la validation).
+    - Modification / Annulation de rendez-vous.
+    - Vérification des créneaux disponibles.
+
+  • Facturation & Paiements
+    - Gestion des factures pour les consultations.
+    - Encaissement "Au Cabinet" : Marquer une facture comme payée manuellement 
+      (Espèces/Chèque sur place).
+    - Émission de factures.
+
+  • Accès Patients (Lecture seule / Admin léger)
+    - Voir la liste des patients du cabinet.
+    - Voir les infos de base et factures d'un patient.
+    - (N'a généralement pas accès aux données médicales sensibles détaillées ou 
+      modification de plans, sauf si autorisé).
+
+--------------------------------------------------------------------------------
+6. FONCTIONNALITÉS ADMINISTRATEUR
+--------------------------------------------------------------------------------
+
+  • Tableau de Bord Global
+    - Statistiques de la plateforme : Nombre total d'utilisateurs, répartition 
+      patients/pros.
+
+  • Validation des Professionnels
+    - Liste des inscriptions de nutritionnistes "En attente".
+    - Vérification des informations (Diplômes, Licence).
+    - Action : Approuver (active le compte) ou Rejeter.
+
+  • Modération Communautaire
+    - Gestion des Signalements (Reports) : Liste des posts signalés par les 
+      utilisateurs.
+    - Actions de modération : Ignorer le signalement ou Supprimer le contenu 
+      (et marquer comme traité).
+
+  • Gestion Utilisateurs
+    - Liste globale des utilisateurs.
+    - Possibilité de supprimer/suspendre un utilisateur en cas d'abus.
+
+--------------------------------------------------------------------------------
+7. ASPECTS TECHNIQUES & PWA
+--------------------------------------------------------------------------------
+
+  • Progressive Web App (PWA)
+    - Le projet inclut un fichier `manifest.json` et `service-worker.js`.
+    - Installable sur mobile (Android/iOS) et Desktop via le navigateur.
+    - Fonctionne en mode "Standalone" (comme une app native).
+    - Cache des ressources statiques (CSS, JS, Images, Fonts) pour chargement rapide.
+    - Page de repli hors-ligne (offline fallback).
+    - Bouton d'installation in-app personnalisé.
+
+  • Base de Données
+    - Gestion centralisée des aliments (Table `aliments`) avec valeurs nutritionnelles.
+    - Suivi précis des interactions sociales (`interactions`).
+
+================================================================================
+Fin du document.
+================================================================================

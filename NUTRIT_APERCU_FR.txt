@@ -1,0 +1,100 @@
+================================================================================
+                    NUTRIT — APERÇU DESCRIPTIF COMPLET (FRANÇAIS)
+================================================================================
+
+Nutrit est une plateforme complète de nutrition et diététique qui met en
+relation les patients et les nutritionnistes professionnels en Tunisie. Le
+site propose quatre rôles distincts — patient, nutritionniste, secrétaire et
+administrateur — et couvre tout : découverte des experts en accès public,
+prise de rendez-vous, plans alimentaires personnalisés, facturation,
+fonctionnalités communautaires et modération.
+
+Les visiteurs peuvent parcourir le site sans se connecter : une page
+d'accueil présente le service, et la page publique « Experts » affiche la
+liste des nutritionnistes actifs avec recherche et filtres (gouvernorat,
+spécialisation, type de consultation, genre) et une carte. Chacun peut
+consulter le profil public d'un nutritionniste : biographie, adresse du
+cabinet, tarif de consultation et disponibilités. L'inscription et la
+connexion sont proposées aux patients, nutritionnistes et secrétaires, avec
+une connexion admin séparée pour l'équipe plateforme ; le site gère aussi
+le mot de passe oublié et la réinitialisation par e-mail.
+
+Une fois inscrits, les patients disposent d'un tableau de bord avec leur
+nutritionniste rattaché, leurs prochains rendez-vous et un résumé du régime.
+Ils peuvent parcourir et rechercher des nutritionnistes, voir les profils
+complets avec avis, et envoyer une « demande » pour être rattachés à un
+professionnel (en attente d'acceptation par la secrétaire du nutritionniste).
+Ils renseignent un profil santé détaillé (poids, taille, objectifs,
+antécédents médicaux, allergies, préférences) et peuvent demander des
+rendez-vous en choisissant date, heure et motif ; ils consultent, modifient
+ou annulent leurs demandes de rendez-vous et voient tous leurs rendez-vous
+au même endroit. Les factures sont listées et consultables, avec possibilité
+d'enregistrer un paiement. Les patients peuvent laisser un avis par
+nutritionniste (note et commentaire), affiché sur le profil de l'expert. Les
+plans alimentaires et de repas assignés par le nutritionniste sont
+consultables (repas par jour et portions), et les patients peuvent enregistrer
+leur suivi des repas et leur progression quotidienne. Un fil communautaire
+permet aux patients (et aux nutritionnistes) de publier des posts, aimer,
+commenter, mettre en favoris, signaler et s'abonner entre eux, avec des
+listes amis, abonnés et abonnements. Le chat privé relie les patients à leur
+nutritionniste et à leurs amis. Les paramètres du compte permettent de
+modifier nom, téléphone, adresse, bio et photo de profil.
+
+Les nutritionnistes ont un tableau de bord avec le nombre de patients actifs
+et les rendez-vous du jour. Ils gèrent un ou plusieurs secrétaires :
+création, modification et suppression de comptes secrétaires rattachés à
+leur cabinet. Ils consultent leur agenda de rendez-vous et la liste des
+patients rattachés, et peuvent ouvrir le profil santé de chaque patient.
+Les modèles de régimes peuvent être gérés et assignés aux patients ; le
+système de plans de repas permet de créer et supprimer des plans détaillés
+par patient (avec recherche d'aliments et unités de portion) et de voir la
+progression. Les disponibilités hebdomadaires sont configurables (jours et
+créneaux). Les nutritionnistes utilisent la même communauté et le même
+chat que les patients — publications, likes, commentaires, abonnements —
+et discutent avec leurs patients. Les paramètres de profil incluent nom du
+cabinet, adresse, tarif, bio, photo, spécialisation et autres informations
+professionnelles.
+
+Les secrétaires agissent pour le compte d'un seul nutritionniste. Leur
+tableau de bord affiche les rendez-vous du jour et deux types de demandes
+en attente : demandes de rattachement (devenir patient du nutritionniste)
+et demandes de rendez-vous (visites demandées par le patient). Les
+secrétaires acceptent ou refusent les deux. Ils peuvent prendre des
+rendez-vous directement (patient, date, heure, motif, type, durée) sans
+passer par une demande, et modifier ou annuler des rendez-vous existants.
+Ils voient la liste des patients rattachés et le profil de chaque patient.
+La facturation se fait par rendez-vous : consulter ou créer des factures,
+voir toutes les factures d'un patient ; les paiements peuvent être marqués
+comme réglés.
+
+Les administrateurs ont une connexion dédiée et accèdent à un tableau de bord
+admin avec les effectifs (total, patients, nutritionnistes) et les derniers
+utilisateurs. Ils peuvent lister et supprimer des utilisateurs et gérer
+les approbations des nutritionnistes (inscriptions en attente acceptées ou
+laissées en attente). Une section rapports liste les signalements de posts
+communautaires ; les admins peuvent filtrer par statut (en attente, examiné,
+rejeté, mesure prise) et, pour chaque signalement, le rejeter, le marquer
+examiné ou prendre une mesure (par ex. supprimer le post signalé).
+
+Nutrit est aussi une PWA (Progressive Web App) : le site peut être installé
+sur l’appareil (mobile ou bureau) comme une application. Un fichier
+manifest.json définit le nom « Nutrit », la description « Votre partenaire
+nutrition santé », l’affichage en mode standalone, la couleur de thème et
+les icônes (192×192 et 512×512). Un Service Worker (service-worker.js) met
+en cache les ressources principales (page d’accueil, manifest, CSS, icônes)
+pour un chargement plus rapide et un usage partiel hors ligne : en
+navigation, la stratégie est « réseau d’abord » avec repli sur le cache
+si le réseau échoue ; pour les autres ressources, « cache d’abord ». Sur la
+page d’accueil, un bouton « Installer l’application » apparaît lorsque le
+navigateur déclenche l’événement beforeinstallprompt, permettant d’ajouter
+Nutrit à l’écran d’accueil ou au bureau.
+
+La plateforme est construite en Java (Jakarta EE), servlets, JSP et MySQL ;
+la sécurité est assurée par un filtre qui restreint les URLs par rôle et
+par une authentification par session avec mots de passe hashés. Nutrit
+couvre donc tout le cycle : découverte des experts, rattachement patient–
+nutritionniste, rendez-vous et demandes, régimes et plans de repas, suivi
+et progression, facturation et paiements, avis, communauté, chat,
+modération administrative et PWA — le tout dans un seul site cohérent.
+
+================================================================================

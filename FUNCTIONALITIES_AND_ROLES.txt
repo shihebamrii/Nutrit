@@ -1,0 +1,507 @@
+================================================================================
+                    NUTRIT - FULL FUNCTIONALITIES AND ROLES
+                         Comprehensive Documentation
+================================================================================
+Generated from repository scan. Java/Servlet app (Jakarta EE), JSP views, MySQL.
+
+--------------------------------------------------------------------------------
+À PROPOS DE NUTRIT — APERÇU DESCRIPTIF COMPLET
+--------------------------------------------------------------------------------
+
+Nutrit est une plateforme complète de nutrition et diététique qui met en
+relation les patients et les nutritionnistes professionnels en Tunisie. Le
+site propose quatre rôles distincts — patient, nutritionniste, secrétaire et
+administrateur — et couvre tout : découverte des experts en accès public,
+prise de rendez-vous, plans alimentaires personnalisés, facturation,
+fonctionnalités communautaires et modération.
+
+[VERSION FRANÇAISE COMPLÈTE DE L'APERÇU CI-DESSOUS : voir NUTRIT_APERCU_FR.txt]
+
+Visitors can explore the site without logging in: a landing page introduces
+the service, and the public “Experts” page lists active nutritionists with
+search and filters (location/governorate, specialization, consultation type,
+gender) and a map view. Anyone can open a nutritionist’s public profile to
+read their bio, cabinet address, consultation tariff, and availability
+summary. Registration and login are available for patients, nutritionists,
+and secretaries, with separate admin login for platform staff; the site
+supports forgot-password and reset-password flows via email.
+
+Patients, once registered, get a dashboard showing their linked
+nutritionist, upcoming appointments, and diet summary. They can browse and
+search nutritionists, view full profiles with reviews, and send a “request”
+to link with a chosen professional (pending approval by the nutritionist’s
+secretary). Patients maintain a detailed health profile (weight, height,
+goals, medical history, allergies, preferences) and can request appointments
+by choosing date, time, and reason; they can view, edit, or cancel
+appointment requests and see all their appointments in one place. Invoices
+are listed and viewable, with the option to record payment. Patients may
+leave one review per nutritionist (rating and comment), visible on the
+expert’s profile. Diet and meal plans assigned by the nutritionist are
+viewable (including daily meals and food portions), and patients can log
+meal tracking and daily progress. A community feed lets patients (and
+nutritionists) create posts, like, comment, bookmark, report, and follow
+each other, with lists for friends, followers, and following. Private chat
+connects patients with their nutritionist and with friends. Account
+settings allow updating name, phone, address, bio, and profile picture.
+
+Nutritionists have a dashboard with active patient count and today’s
+appointments. They manage one or more secretaries: create, edit, and delete
+secretary accounts linked to their cabinet. They view their full appointment
+calendar and list of linked patients, and can open any patient’s health
+profile. Diet templates can be managed and assigned to patients; the
+meal-plan system lets nutritionists create and delete detailed meal plans
+per patient (with food search and portion units) and view progress. Weekly
+availability is configurable (days and time slots). Nutritionists use the
+same community and chat as patients—posting, liking, commenting, following—
+and chat with their patients. Profile settings include cabinet name, address,
+tariff, bio, photo, specialization, and other professional details.
+
+Secretaries work on behalf of a single nutritionist. Their dashboard shows
+today’s appointments and two kinds of pending requests: patient link
+requests (to become a patient of the nutritionist) and appointment
+requests (patient-requested visits). Secretaries accept or reject both. They
+can book appointments directly (choose patient, date, time, reason, type,
+duration) without a request flow, and can edit or cancel existing
+appointments. They view the list of linked patients and any patient’s
+profile. Invoicing is handled per appointment: view or create invoices and
+see all invoices for a given patient; payments can be marked as paid.
+
+Les administrateurs ont une connexion dédiée et accèdent à un tableau de bord
+admin avec les effectifs (total, patients, nutritionnistes) et les derniers
+utilisateurs. Ils peuvent lister et supprimer des utilisateurs et gérer
+les approbations des nutritionnistes (inscriptions en attente acceptées ou
+laissées en attente). Une section rapports liste les signalements de posts
+communautaires ; les admins peuvent filtrer par statut (en attente, examiné,
+rejeté, mesure prise) et, pour chaque signalement, le rejeter, le marquer
+examiné ou prendre une mesure (par ex. supprimer le post signalé).
+
+La plateforme est construite en Java (Jakarta EE), servlets, JSP et MySQL ;
+la sécurité est assurée par un filtre qui restreint les URLs par rôle et
+par une authentification par session avec mots de passe hashés. Nutrit
+couvre donc tout le cycle : découverte des experts, rattachement patient–
+nutritionniste, rendez-vous et demandes, régimes et plans de repas, suivi
+et progression, facturation et paiements, avis, communauté, chat et
+modération administrative — le tout dans un seul site cohérent. Nutrit est
+également une PWA (Progressive Web App) : installation possible sur mobile
+ou bureau, manifest (nom, icônes, thème), Service Worker pour cache et
+usage partiel hors ligne, bouton « Installer l'application » sur la page
+d'accueil (voir NUTRIT_APERCU_FR.txt et section 10 ci-dessous).
+
+--------------------------------------------------------------------------------
+1. ROLES OVERVIEW
+--------------------------------------------------------------------------------
+
+The application has FOUR user roles (stored in DB as: patient, nutritionniste, 
+secretaire, administrateur; code uses: patient, nutritionist, secretary, admin):
+
+  • PATIENT       - End user seeking nutrition advice and follow-up
+  • NUTRITIONIST  - Professional providing diet plans, consultations, availability
+  • SECRETARY     - Assists one nutritionist: appointments, requests, invoices
+  • ADMIN         - Platform administration: users, approvals, community reports
+
+Access control is enforced by SecurityFilter: /admin/*, /nutritionist/*, 
+/secretary/*, /patient/* are restricted by role. Public paths: /, /home, 
+/landing, /auth/*, /public/*, /experts, /profile/*, /assets/*.
+
+--------------------------------------------------------------------------------
+2. AUTHENTICATION & PUBLIC (No login required)
+--------------------------------------------------------------------------------
+
+  • Landing / Home
+    - URLs: /home, /landing
+    - LandingServlet: marketing/landing page
+
+  • Login (patient/nutritionist/secretary)
+    - GET/POST /auth/login
+    - Redirects by role: patient -> /patient/dashboard, nutritionist -> 
+      /nutritionist/dashboard, secretary -> /secretary/dashboard
+
+  • Register
+    - GET/POST /auth/register
+    - New user registration (role assigned on registration)
+
+  • Admin login (separate entry)
+    - GET/POST /auth/admin/login
+    - Only users with role "admin" can access; redirect to /admin/dashboard
+
+  • Forgot password
+    - GET /auth/forgot-password, POST to request reset; email with token
+
+  • Reset password
+    - GET /auth/reset-password?token=..., POST to set new password
+    - Token validated via UserDAO
+
+  • Logout
+    - /auth/logout - invalidates session, redirect to login or home
+
+  • Public expert listing (no login)
+    - GET /experts - list all active nutritionists with filters:
+      q (search), gov (governorate), spec (specialization), type (consultation 
+      type), gender
+    - PublicServlet: searchNutritionists, map with coordinates for map view
+
+  • Public nutritionist profile (no login)
+    - GET /profile/<id> - view one nutritionist's public profile (bio, 
+      address, tariff, availability summary, etc.)
+
+--------------------------------------------------------------------------------
+3. PATIENT FUNCTIONALITIES
+--------------------------------------------------------------------------------
+
+  Dashboard
+    - GET /patient/dashboard
+    - Overview: linked nutritionist, upcoming appointments, diet plan summary, 
+      quick actions
+
+  Browse nutritionists (logged-in)
+    - GET /patient/nutritionists
+    - List/search nutritionists (for requesting or booking)
+
+  View nutritionist profile (logged-in)
+    - GET /patient/nutritionist-profile?nutritionistId=...
+    - Full profile, reviews, button to "Request" or "Book appointment"
+
+  Request to link with a nutritionist
+    - GET/POST /patient/requestNutritionist?nutritionistId=...
+    - Creates a patient request (pending until secretary/nutritionist accepts)
+
+  Health profile
+    - GET /patient/health-profile - show form with health data
+    - POST /patient/saveHealthProfile - save weight, height, goals, medical 
+      history, allergies, preferences, etc.
+
+  Book appointment (request)
+    - GET /patient/bookAppointment - form (nutritionist, date, time, reason)
+    - POST /patient/bookAppointment - submit appointment request (pending 
+      approval)
+
+  Appointment requests list
+    - GET /patient/appointmentRequests
+    - View status of sent appointment requests
+
+  Edit/Cancel appointment
+    - GET /patient/editAppointment?id=...
+    - POST /patient/editAppointment - update date/time/reason
+    - POST /patient/cancelAppointment - cancel appointment
+
+  Appointments list (unified)
+    - GET /patient/appointments (AppointmentServlet)
+    - All appointments for the patient
+
+  Invoices
+    - GET /patient/invoices - list invoices
+    - GET /patient/invoice?id=... - view single invoice
+    - POST /patient/processPayment - record payment (e.g. mark paid)
+
+  Add review for nutritionist
+    - POST /patient/addReview (nutritionistId, rating, comment)
+    - Shown on nutritionist profile; one review per patient per nutritionist
+
+  Diet plan (view)
+    - GET /patient/diet (DietServlet)
+    - View assigned diet plans (list)
+
+  Meal plan (detailed)
+    - GET /patient/mealPlan (MealPlanServlet)
+    - View assigned meal plan (per day/meal), food list, portions
+
+  Save meal tracking
+    - POST /patient/saveMealTracking (MealPlanServlet)
+    - Log what was eaten (meal tracking) for a given day
+
+  Log daily progress
+    - POST /patient/logProgress
+    - Log daily progress (e.g. weight, notes)
+
+  Community (patient)
+    - GET /patient/posts - community feed (posts from followed users + own)
+    - GET /patient/posts/bookmarks - bookmarked posts
+    - GET /patient/posts/user?userId=... - another user's post feed
+    - GET /patient/friends - friends list
+    - GET /patient/followers - followers list
+    - GET /patient/following - following list
+    - POST /patient/posts/like - like a post
+    - POST /patient/posts/comment - add comment
+    - GET /patient/posts/comments - (AJAX) get comments for a post
+    - POST /patient/posts/bookmark - bookmark a post
+    - POST /patient/posts/report - report a post
+    - POST /patient/posts/delete - delete own post
+    - POST /patient/posts/follow - follow a user
+
+  Chat
+    - GET /chat/ - chat interface; conversations with nutritionist and 
+      friends (CommunityDAO friends)
+    - GET /chat/poll - get new messages (AJAX)
+    - POST /chat/send - send message
+
+  Profile / Settings (common)
+    - GET /profile - account settings page
+    - POST /profile (action=updateBasic, updateNutritionist, etc.) - update 
+      name, phone, address, bio, profile picture; nutritionists can update 
+      cabinet info, tariff, etc.
+
+  Common appointments view
+    - GET /patient/appointments - same as above (AppointmentServlet)
+
+--------------------------------------------------------------------------------
+4. NUTRITIONIST FUNCTIONALITIES
+--------------------------------------------------------------------------------
+
+  Dashboard
+    - GET /nutritionist/dashboard
+    - Active patients count, today's appointments list (no pending requests; 
+      those are on secretary dashboard)
+
+  Secretaries management
+    - GET /nutritionist/createSecretary - form to add secretary
+    - POST /nutritionist/createSecretary - create secretary account (linked 
+      to this nutritionist)
+    - GET /nutritionist/secretaries - list secretaries
+    - GET/POST /nutritionist/editSecretary?id=... - edit secretary (name, 
+      email, phone)
+    - GET /nutritionist/deleteSecretary?id=... - delete secretary
+
+  Appointments
+    - GET /nutritionist/appointments (AppointmentServlet)
+    - List all appointments for this nutritionist
+
+  Patients list
+    - GET /nutritionist/patients
+    - List patients linked to this nutritionist (accepted requests)
+
+  View patient profile
+    - GET /nutritionist/viewPatientProfile?patientId=...
+    - View patient health profile and history
+
+  Diet templates
+    - GET /nutritionist/dietTemplates
+    - Manage diet templates (reusable plans)
+
+  Assign diet
+    - GET /nutritionist/assignDiet - form to assign diet to patient
+    - POST /nutritionist/assignDiet - assign diet plan to patient
+
+  Diet management (view)
+    - GET /nutritionist/diet (DietServlet)
+    - Diet management view (diet_manage.jsp)
+
+  Meal plans (current system)
+    - GET /nutritionist/mealPlan - list meal plans by nutritionist + patients
+    - GET /nutritionist/mealPlan/create?patientId=... - form to create meal plan
+    - POST /nutritionist/mealPlan/create - create meal plan for patient
+    - POST /nutritionist/mealPlan/delete - delete a meal plan
+
+  Availability
+    - GET /nutritionist/availability - form to set weekly availability (slots)
+    - POST /nutritionist/availability - save availability (disponibilites table)
+
+  Community (nutritionist)
+    - GET /nutritionist/posts - feed
+    - GET /nutritionist/posts/bookmarks, /nutritionist/posts/user, 
+      /nutritionist/followers, /nutritionist/following
+    - POST /nutritionist/posts/like, comment, bookmark, report, delete, follow
+    - Same structure as patient community; nutritionists can post and 
+      interact
+
+  Chat
+    - GET /chat/ - chat with patients (and own contacts)
+    - POST /chat/send - send message
+
+  Profile / Settings
+    - GET/POST /profile - update basic info + nutritionist-specific (cabinet, 
+      tariff, bio, photo, specialization, etc.)
+
+--------------------------------------------------------------------------------
+5. SECRETARY FUNCTIONALITIES
+--------------------------------------------------------------------------------
+
+  Dashboard
+    - GET /secretary/dashboard
+    - Today's appointments for linked nutritionist; pending patient requests 
+      (to link); pending appointment requests (to approve/reject)
+
+  Accept patient request (link patient to nutritionist)
+    - GET /secretary/acceptRequest?requestId=...&action=accept
+    - Accept or reject a patient's "request" to become a patient of the 
+      nutritionist
+
+  Appointments
+    - GET /secretary/appointments
+    - List today's and all upcoming appointments for the nutritionist; 
+      patients list for booking
+
+  Book appointment (by secretary)
+    - GET /secretary/bookAppointment - form (patient, date, time, reason, 
+      type, duration)
+    - POST /secretary/bookAppointment - create appointment directly (no 
+      request flow)
+
+  Appointment requests (from patients)
+    - GET /secretary/appointmentRequests
+    - List pending appointment requests; approve or reject
+    - POST /secretary/approveAppointmentRequest
+    - POST /secretary/rejectAppointmentRequest
+
+  Direct booking
+    - GET /secretary/bookDirect - form for direct booking
+    - POST /secretary/bookDirect - same as bookAppointment (direct create)
+
+  Edit appointment
+    - GET /secretary/editAppointment?id=...
+    - POST /secretary/editAppointment - update date, time, reason, status
+
+  Cancel appointment
+    - POST /secretary/cancelAppointment - cancel appointment
+
+  Patients list
+    - GET /secretary/patients
+    - List patients linked to the nutritionist (for booking dropdown, etc.)
+
+  View patient profile
+    - GET /secretary/viewPatientProfile?patientId=...
+
+  Invoices
+    - GET /secretary/invoice?id=... - view/create invoice for appointment
+    - GET /secretary/patientInvoices?patientId=... - list invoices for a patient
+    - POST /secretary/markPaid - mark invoice as paid
+
+  Common
+    - GET /secretary/appointments (AppointmentServlet) - same list via common 
+      appointments view if used
+    - Profile/Settings: GET/POST /profile (same as other roles for basic info)
+
+--------------------------------------------------------------------------------
+6. ADMIN FUNCTIONALITIES
+--------------------------------------------------------------------------------
+
+  Dashboard
+    - GET /admin/dashboard
+    - Counts: total users, patients, nutritionists; recent users list
+
+  Users management
+    - GET /admin/users - list nutritionists (or all users depending on impl)
+    - GET /admin/deleteUser?id=... - delete user
+
+  Approvals (nutritionist registration)
+    - GET /admin/approvals - list pending nutritionists (statut = en_attente)
+    - GET /admin/approve?id=... - approve nutritionist (set statut = actif)
+
+  Reports (community content moderation)
+    - GET /admin/reports - list reported posts (PostReport); filter: pending, 
+      all; tabs: pending, reviewed, dismissed, action_taken
+    - POST /admin/reports/review (AdminReportsServlet)
+      - Parameters: reportId, postId, action (dismiss | delete | review)
+      - dismiss -> status dismissed
+      - delete -> status action_taken + delete post
+      - review -> status reviewed
+
+--------------------------------------------------------------------------------
+7. SHARED / COMMON FUNCTIONALITIES
+--------------------------------------------------------------------------------
+
+  • Appointments (unified view)
+    - GET /patient/appointments | /nutritionist/appointments | 
+      /secretary/appointments
+    - AppointmentServlet: getAppointmentsByRole(role, userId); same JSP 
+      common/appointments.jsp
+
+  • Chat
+    - /chat/* - used by patient and nutritionist (and possibly secretary if 
+      given access); ChatServlet loads friends + nutritionist/patients for 
+      conversation list
+
+  • Profile / Settings
+    - GET/POST /profile - all logged-in roles; updates basic info; 
+      nutritionist can update cabinet, tariff, bio, photo
+
+  • Community
+    - Patient and Nutritionist: same features (posts, like, comment, 
+      bookmark, report, follow, followers, following, friends). Community 
+      feed and user profile pages are role-prefixed (/patient/... or 
+      /nutritionist/...).
+
+  • Diet (view)
+    - GET /patient/diet -> patient's assigned plans
+    - GET /nutritionist/diet -> diet management page (nutritionist)
+
+--------------------------------------------------------------------------------
+8. API ENDPOINTS (AJAX / Data)
+--------------------------------------------------------------------------------
+
+  • MealPlanServlet
+    - GET /api/foods - list food items (for meal plan builder)
+    - GET /api/foods/search - search foods
+    - GET /api/patient/progress - get daily progress for a patient (e.g. 
+      for charts)
+
+  • CommunityServlet
+    - GET /patient/posts/comments (or /nutritionist/...) - get comments for 
+      a post (AJAX)
+
+  • ChatServlet
+    - GET /chat/poll - poll new messages
+
+  • AdminReportsServlet
+    - POST /admin/reports/review - JSON response (success/error)
+
+--------------------------------------------------------------------------------
+9. DATABASE ENTITIES (Main tables)
+--------------------------------------------------------------------------------
+
+  • utilisateurs     - All users (patient, nutritionniste, secretaire, 
+                       administrateur); profile fields, health goals, 
+                       nutritionist_id for secretary link
+  • aliments         - Food items (French/Arabic names, categories, 
+                       calories, macros, image_path)
+  • details_plan_repas - Meal plan details (plan_id, day, moment_repas, 
+                       aliment ids, quantities)
+  • plans_alimentaires - Diet/meal plans (template or patient-assigned)
+  • rendez_vous      - Appointments (patient, nutritionist, secretary, 
+                       date/time, status)
+  • disponibilites   - Nutritionist weekly availability (jour_semaine, 
+                       heure_debut, heure_fin, creneau)
+  • demandes_patients - Patient request to link to a nutritionist (pending/accepted)
+  • demandes_rendez_vous - Appointment requests (patient-requested, 
+                       pending approval)
+  • factures / invoices - Invoices linked to appointments
+  • paiements        - Payments
+  • suivi_quotidien  - Daily tracking (weight, meals logged, etc.)
+  • interactions     - Community: posts, likes, comments, bookmarks, 
+                       reports, follows (structure may use multiple tables 
+                       e.g. community_posts, post_likes, post_comments, 
+                       post_reports, user_follows)
+  • Chat messages    - ChatDAO / messages table for private messages
+
+(Exact table names may be in French in nutrit.sql: e.g. rendez_vous, 
+disponibilites, demandes_patients, factures, suivi_quotidien, etc.)
+
+--------------------------------------------------------------------------------
+10. TECHNICAL SUMMARY
+--------------------------------------------------------------------------------
+
+  • Stack: Java (Jakarta EE), Servlets, JSP, JSTL, MySQL, Gson, JBcrypt, 
+    Jakarta Mail (email), optional file upload (UploadUtil).
+  • Security: SecurityFilter for role-based access; session attribute "user" 
+    (User model); password hashing (Bcrypt).
+  • Roles in code: "patient", "nutritionist", "secretary", "admin" (DB may use 
+    nutritionniste, secretaire, administrateur; mapping in UserDAO).
+  • Views: WEB-INF/views/ with role folders (admin, auth, common, 
+    nutritionist, patient, public, secretary).
+
+  • PWA (Progressive Web App):
+    - manifest.json: name "Nutrit", short_name "Nutrit", description 
+      "Votre partenaire nutrition santé.", display "standalone", 
+      theme_color #4CAF50, icons 192×192 and 512×512 (assets/icons/).
+    - service-worker.js: cache name "nutrit-v3"; caches /, manifest.json, 
+      CSS (style.css, landing.css), icons; install/activate/fetch events.
+    - Fetch strategy: Network First for navigation (fallback to cache if 
+      offline); Cache First for other assets.
+    - index.jsp: <link rel="manifest" href=".../manifest.json">; 
+      "Install app" button (installAppBtn) shown on beforeinstallprompt; 
+      navigator.serviceWorker.register('service-worker.js'). Public paths 
+      /service-worker.js and /manifest.json allowed by SecurityFilter.
+
+================================================================================
+End of document. For exact URLs and parameters, refer to the servlet classes
+under src/java/com/nutrit/controllers/ and filters under .../filters/.
+================================================================================

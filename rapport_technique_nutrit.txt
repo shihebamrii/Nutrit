@@ -1,0 +1,29 @@
+### 🏗️ Architecture & Environnement de Développement
+*   **Architecture** : Le projet suit strictement le **modèle MVC (Modèle-Vue-Contrôleur)**, organisé en packages clairs (`controllers`, `models`, `dao`, `utils`, `filters`) pour une séparation nette des responsabilités.
+*   **Plateforme** : Développé sur **Jakarta EE 9.1** (anciennement Java EE), assurant une structure robuste pour une application web d'entreprise.
+*   **IDE & Build** : Projet structuré pour **Apache NetBeans**, utilisant **Apache Ant** (`build.xml`) pour l'automatisation de la compilation et du déploiement.
+
+### 💻 Frontend (Interface Utilisateur)
+*   **Langages** : **JSP (JavaServer Pages)** pour le rendu dynamique côté serveur, couplé à du **HTML5** sémantique et du **JavaScript (ES6+)** natif (sans dépendance lourde comme jQuery pour une performance optimale).
+*   **Styles (CSS)** : Utilisation de **CSS3 Vanilla** (fichiers `landing.css`, `style.css`, `modern-theme.css`) avec une approche de design moderne ("Glassmorphism", dégradés, animations).
+*   **Progressive Web App (PWA)** : Implémentation complète avec un **Manifeste Web** (`manifest.json`) et un **Service Worker** (`service-worker.js`) pour permettre l'installation de l'application sur mobile et bureau.
+*   **Assets & Bibliothèques** :
+    *   **Font Awesome 6.5.1** (CDN) pour l'iconographie vectorielle.
+    *   **Google Fonts** (familles "Inter" et "Playfair Display") pour une typographie premium.
+    *   **JSTL (JavaServer Pages Standard Tag Library) 2.0** pour la logique d'affichage dans les vues (boucles, conditions).
+
+### ⚙️ Backend & Logique Serveur
+*   **Contrôleurs** : Utilisation de **Jakarta Servlets** (`AuthServlet`, `ChatServlet`, etc.) pour intercepter et traiter les requêtes HTTP.
+*   **Manipulation de Données (JSON)** : Utilisation de la bibliothèque **Google Gson 2.8.9** (`gson-2.8.9.jar`) pour la sérialisation/désérialisation JSON, essentielle pour les échanges de données dynamiques (AJAX).
+*   **Communication Email** : Intégration de **Jakarta Mail** (`jakarta.mail-api`) configurée avec le relais SMTP de **Brevo** (`smtp-relay.brevo.com`) via le fichier `mail.properties` pour l'envoi d'emails transactionnels (réinitialisation de mot de passe, notifications).
+*   **Gestion des Fichiers** : Utilitaire `UploadUtil` natif exploitant les `Part` de l'API Servlet pour l'upload sécurisé d'images (profils, justificatifs).
+
+### 🗄️ Base de Données & Persistance
+*   **SGBD** : **MySQL 8** est utilisé comme moteur de base de données relationnelle.
+*   **Connectivité** : Connexion via **JDBC** avec le pilote **MySQL Connector/J 8.0.28** (`mysql-connector-java-8.0.28.jar`).
+*   **Pattern DAO** : L'accès aux données est encapsulé dans des **DAOs** (`UserDAO`, `NutritionistReviewDAO`), isolant les requêtes SQL du reste de l'application.
+
+### 🔒 Sécurité & Configuration
+*   **Cryptographie** : Utilisation de **BCrypt** (`jbcrypt-0.4.jar`) pour le hachage sécurisé et le salage des mots de passe utilisateurs.
+*   **Filtres de Sécurité** : Implémentation de **`SecurityFilter`** pour gérer l'authentification, les sessions utilisateurs et le contrôle d'accès aux pages protégées.
+*   **Configuration** : Paramétrage centralisé via `web.xml` (descripteur de déploiement) et fichiers de propriétés (`mail.properties`).
