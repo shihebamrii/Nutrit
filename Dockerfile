@@ -30,5 +30,5 @@ RUN rm -rf /usr/local/tomcat/webapps/*
 # Copy WAR from build stage to Tomcat webapps
 COPY --from=build /app/dist/Nutrit.war /usr/local/tomcat/webapps/ROOT.war
 
-EXPOSE 8080
-CMD ["catalina.sh", "run"]
+# Set port dynamically for Render
+CMD sed -i "s/8080/${PORT:-8080}/g" /usr/local/tomcat/conf/server.xml && catalina.sh run
